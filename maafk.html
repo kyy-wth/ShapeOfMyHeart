@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surat Untuk Keyla 🤍</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* PALET WARNA & ROOT VARIABLES */
+        :root {
+            --pink-pastel: #FFD6E0;
+            --cream-soft: #FFF5F5;
+            --rose-gold: #B76E79;
+            --rose-accent: #FF7096;
+            --sky-dark: #1E1026;
+            --sky-light: #442B4D;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--sky-dark) 0%, var(--sky-light) 100%);
+            color: var(--cream-soft);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* GLASSMORPHISM CARD */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        /* FONTS */
+        .font-serif-lux {
+            font-family: 'Playfair Display', serif;
+        }
+        .font-cursive-hand {
+            font-family: 'Dancing Script', cursive;
+        }
+
+        /* FLOATING MUSIC CONTROLLER STYLE */
+        #music-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #FFD6E0;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        #music-btn:hover {
+            transform: scale(1.1);
+            border-color: #FF7096;
+            color: #FF7096;
+        }
+        #music-btn.playing i {
+            animation: spin 4s linear infinite;
+            color: #FF7096;
+        }
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        /* LOADING ANIMATION */
+        .heart-beat {
+            animation: beat 1.2s infinite alternate;
+        }
+        @keyframes beat {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.25); }
+        }
+
+        /* FALLING HEARTS & FLOATING NOTES */
+        .falling-heart {
+            position: fixed;
+            top: -20px;
+            pointer-events: none;
+            z-index: 10;
+            animation: fall linear forwards;
+        }
+        @keyframes fall {
+            to {
+                transform: translateY(105vh) rotate(360deg);
+            }
+        }
+
+        .touch-heart {
+            position: absolute;
+            pointer-events: none;
+            z-index: 100;
+            animation: floatUp 1s ease-out forwards;
+        }
+        @keyframes floatUp {
+            0% { opacity: 1; transform: scale(1) translateY(0); }
+            100% { opacity: 0; transform: scale(0.5) translateY(-100px); }
+        }
+
+        .floating-note {
+            position: fixed;
+            background: rgba(255, 214, 224, 0.15);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--pink-pastel);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-family: var(--font-cursive);
+            font-size: 1.25rem;
+            z-index: 5;
+            pointer-events: none;
+            opacity: 0;
+            animation: drift 6s linear forwards;
+        }
+        @keyframes drift {
+            0% { opacity: 0; transform: translateY(100vh) scale(0.8); }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.8; }
+            100% { opacity: 0; transform: translateY(-20vh) scale(1.1); }
+        }
+
+        /* ENVELOPE INTERACTION */
+        .envelope-wrapper {
+            perspective: 1000px;
+            position: relative;
+            width: 320px;
+            height: 220px;
+            background: #FFD6E0;
+            border-radius: 6px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            margin: 40px auto;
+        }
+        .envelope-flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            border-left: 160px solid transparent;
+            border-right: 160px solid transparent;
+            border-top: 110px solid #B76E79;
+            transform-origin: top;
+            transition: transform 0.6s ease;
+            z-index: 3;
+        }
+        .envelope-wrapper.opened .envelope-flap {
+            transform: rotateX(180deg);
+            z-index: 1;
+        }
+        .envelope-front {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 160px solid var(--sky-light);
+            border-right: 160px solid var(--sky-light);
+            border-bottom: 120px solid #FFD6E0;
+            border-radius: 0 0 6px 6px;
+            z-index: 2;
+        }
+        .envelope-letter {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            background-color: #FAF8F5;
+            color: #1A1A1A;
+            padding: 20px;
+            border-radius: 4px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            transition: transform 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+            z-index: 1;
+            transform: translateY(0);
+            max-height: 190px;
+            overflow: hidden;
+            border: 1px solid #ECE3D5;
+        }
+        .envelope-wrapper.opened .envelope-letter {
+            transform: translateY(-160px);
+            z-index: 4;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+        }
+
+        /* TWINKLING STARS */
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle infinite alternate;
+        }
+        @keyframes twinkle {
+            0% { opacity: 0.2; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1.2); }
+        }
+
+        /* REVEALING PARAGRAPHS */
+        .letter-p {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 1s ease, transform 1s ease;
+        }
+        .letter-p.reveal {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* GIFT BOX */
+        .gift-box-wrap {
+            display: none;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+        .gift-box-wrap.visible {
+            display: block;
+            opacity: 1;
+        }
+        .gift-box {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            cursor: pointer;
+            animation: sway 2.5s infinite ease-in-out alternate;
+        }
+        @keyframes sway {
+            0% { transform: rotate(-5deg); }
+            100% { transform: rotate(5deg); }
+        }
+        .gift-lid {
+            position: absolute;
+            top: 0;
+            left: -5px;
+            width: 110px;
+            height: 25px;
+            background: #FFD6E0;
+            border: 2px solid #FFF5F5;
+            border-radius: 4px;
+            transition: transform 0.5s ease;
+            z-index: 10;
+        }
+        .gift-box.opened .gift-lid {
+            transform: translateY(-40px) rotate(-15deg);
+            opacity: 0;
+        }
+        .gift-body {
+            position: absolute;
+            top: 25px;
+            left: 0;
+            width: 100px;
+            height: 75px;
+            background: #B76E79;
+            border: 2px solid #FFF5F5;
+            border-radius: 0 0 4px 4px;
+            z-index: 9;
+        }
+        .gift-ribbon-v {
+            position: absolute;
+            left: 45px;
+            width: 10px;
+            height: 100%;
+            background: #FF7096;
+            z-index: 99;
+        }
+        .gift-ribbon-h {
+            position: absolute;
+            top: 25px;
+            width: 100%;
+            height: 10px;
+            background: #FF7096;
+            z-index: 99;
+        }
+
+        /* CONFETTI PARTICLE */
+        .confetti {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            z-index: 999;
+            pointer-events: none;
+            animation: fall linear forwards;
+        }
+
+        /* PEEKING CUTE CSS CAT */
+        .peeking-cat {
+            position: fixed;
+            bottom: -4px;
+            left: 24px;
+            width: 70px;
+            height: 60px;
+            z-index: 150;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .peeking-cat:hover {
+            transform: translateY(-8px);
+        }
+        .cat-head {
+            position: absolute;
+            bottom: 0;
+            width: 70px;
+            height: 50px;
+            background: #FFF5F5;
+            border: 2px solid #FFD6E0;
+            border-radius: 40px 40px 0 0;
+        }
+        .cat-ear {
+            position: absolute;
+            top: -11px;
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 14px solid #FFF5F5;
+        }
+        .cat-ear::after {
+            content: '';
+            position: absolute;
+            top: 4px;
+            left: -6px;
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-bottom: 9px solid #FFD6E0;
+        }
+        .cat-ear-left {
+            left: 5px;
+            transform: rotate(-15deg);
+            animation: earTwitchLeft 6s infinite;
+        }
+        .cat-ear-right {
+            right: 5px;
+            transform: rotate(15deg);
+            animation: earTwitchRight 6s infinite;
+        }
+        .cat-eyes {
+            position: absolute;
+            top: 15px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 16px;
+        }
+        .cat-eye {
+            width: 8px;
+            height: 8px;
+            background: #442B4D;
+            border-radius: 50%;
+            animation: catBlink 4s infinite;
+            transform-origin: center;
+        }
+        .cat-nose {
+            position: absolute;
+            top: 22px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 4px;
+            background: #FF7096;
+            border-radius: 50%;
+        }
+        .cat-blush {
+            position: absolute;
+            top: 23px;
+            width: 10px;
+            height: 6px;
+            background: rgba(255, 112, 150, 0.4);
+            border-radius: 50%;
+        }
+        .cat-blush-left { left: 9px; }
+        .cat-blush-right { right: 9px; }
+        .cat-paws {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 10px;
+        }
+        .cat-paw {
+            width: 12px;
+            height: 9px;
+            background: #FFF5F5;
+            border: 2px solid #FFD6E0;
+            border-bottom: none;
+            border-radius: 6px 6px 0 0;
+        }
+        .cat-bubble {
+            position: absolute;
+            top: -45px;
+            left: 50%;
+            transform: translateX(-50%) scale(0);
+            background: white;
+            color: #442B4D;
+            padding: 4px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: bold;
+            white-space: nowrap;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+            border: 1px solid #FFD6E0;
+            font-family: 'Poppins', sans-serif;
+        }
+        .cat-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 5px 5px 0;
+            border-style: solid;
+            border-color: white transparent;
+            display: block;
+            width: 0;
+        }
+        .peeking-cat.meow .cat-bubble {
+            transform: translateX(-50%) scale(1);
+        }
+
+        @keyframes catBlink {
+            0%, 90%, 100% { transform: scaleY(1); }
+            95% { transform: scaleY(0.1); }
+        }
+        @keyframes earTwitchLeft {
+            0%, 90%, 100% { transform: rotate(-15deg); }
+            93% { transform: rotate(-25deg); }
+            96% { transform: rotate(-10deg); }
+        }
+        @keyframes earTwitchRight {
+            0%, 90%, 100% { transform: rotate(15deg); }
+            93% { transform: rotate(10deg); }
+            96% { transform: rotate(25deg); }
+        }
+    </style>
+</head>
+<body class="selection:bg-[#FFD6E0] selection:text-neutral-900">
+
+    <!-- TWINKLING BACKGROUND STARS -->
+    <div id="sky-stars" class="absolute inset-0 overflow-hidden pointer-events-none z-0"></div>
+
+    <!-- FLOATING MUSIC CONTROLLER (Ditampilkan melayang dengan gaya Glassmorphism) -->
+    <button id="music-btn">
+        <i class="fa-solid fa-music"></i>
+    </button>
+    <audio id="bg-music" loop>
+        <!-- Tag musik lokal mengarah ke file "music.mp3" di folder yang sama -->
+        <source src="audio/musikmh.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- 1. LOADING SCREEN -->
+    <div id="loading-screen" class="fixed inset-0 bg-[#1E1026] z-[9999] flex flex-col items-center justify-center">
+        <div class="heart-beat text-[#FF7096] text-6xl mb-6">
+            <i class="fa-solid fa-heart"></i>
+        </div>
+        <p class="font-serif-lux text-[#FFF5F5] tracking-widest text-lg md:text-xl px-6 text-center animate-pulse">
+            menyiapkan surat untuk adik...
+        </p>
+    </div>
+    
+    <!-- 2. GRAND ENTRANCE (HALAMAN PERTAMA) -->
+    <section class="min-h-screen flex flex-col items-center justify-center relative z-10 px-6 text-center">
+        <div class="max-w-2xl mx-auto flex flex-col items-center">
+            <h1 class="font-serif-lux text-2xl md:text-4xl text-[#FFD6E0] tracking-wide mb-3 leading-snug">
+                untuk seseorang yang paling aku sayang.
+            </h1>
+            <p class="font-cursive-hand text-xl md:text-2xl text-[#FFF5F5] mb-8">
+                uku punya sesuatu yang ingin aku sampaikan.
+            </p>
+
+            <!-- Interactive Envelope -->
+            <div class="envelope-container mb-6" style="perspective: 1000px;">
+                <div class="envelope-wrapper" id="royal-envelope">
+                    <div class="envelope-flap"></div>
+                    <div class="envelope-front"></div>
+                    <div class="envelope-letter flex flex-col justify-between">
+                        <div class="border-b border-neutral-200 pb-2 mb-2">
+                            <h4 class="font-serif-lux text-xs font-bold text-[#442B4D]">To: Keylaa My Love 🤍</h4>
+                        </div>
+                        <p class="font-cursive-hand text-base text-neutral-800 leading-tight">
+                            baca suratnya pelan pelan ya sayang...
+                        </p>
+                        <div class="text-right text-[10px] text-neutral-400">
+                            - Dari aku
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button id="open-btn" class="glass-card hover:bg-white/10 hover:border-[#FFD6E0] text-[#FFD6E0] hover:text-[#FFF5F5] font-serif-lux px-10 py-4 rounded-full tracking-widest uppercase text-xs transition-all duration-300 shadow-md">
+                Buka Surat <i class="fa-solid fa-envelope-open-text ml-2 text-xs"></i>
+            </button>
+        </div>
+    </section>
+
+    <!-- 3. ISI SURAT (THE APOLOGY LETTER) -->
+    <section id="letter-section" class="min-h-screen py-24 flex items-center justify-center relative z-10 px-6">
+        <div class="container mx-auto max-w-2xl">
+            <!-- Glassmorphism Letter Container -->
+            <div class="glass-card rounded-2xl p-8 md:p-12 border border-white/10 shadow-2xl relative overflow-hidden">
+                <!-- Top subtle lighting source -->
+                <div class="absolute top-0 left-0 right-0 h-[4px] bg-gradient-to-r from-transparent via-[#FFD6E0] to-transparent"></div>
+                
+                <div class="letter-scroll-area flex flex-col gap-6 text-base md:text-lg leading-relaxed text-[#FFF5F5] font-light">
+                    <p class="letter-p font-serif-lux text-2xl font-semibold text-[#FFD6E0]" data-index="0">halooo sayangg.</p>
+                    <p class="letter-p" data-index="1">aku membuat halaman ini karena ada sesuatu yang ingin aku sampaikan dari hati akuu.</p>
+                    <p class="letter-p" data-index="2">aku tahu aku sudah membuat kamu sedih dan terluka karena kata kata aku.</p>
+                    <p class="letter-p text-[#FF7096] font-semibold" data-index="3">aku benar benar minta maafff.</p>
+                    <p class="letter-p" data-index="4">aku tidak pernah bermaksud membuat kamu merasa menjadi orang jahat.</p>
+                    <p class="letter-p" data-index="5">aku juga tidak pernah menganggap kamu tidak menghargai usaha aku.</p>
+                    <p class="letter-p" data-index="6">kalau sampai kata kata aku membuat kamu berpikir seperti itu, maka itu adalah kesalahan aku.</p>
+                    <p class="letter-p" data-index="7">aku menyesal karena sudah membuat hati adik sakit :c</p>
+                    <p class="letter-p" data-index="8">mungkin seribu maaf tidak cukup untuk menghilangkan rasa sedih yang kamu rasakan.</p>
+                    <p class="letter-p text-[#FFD6E0] font-medium" data-index="9">tapi aku tetap ingin meminta maaf.</p>
+                    <p class="letter-p" data-index="10">karena kamu adalah seseorang yang sangat berarti untuk akuu.</p>
+                    <p class="letter-p" data-index="11">terima kasih karena selama ini sudah hadir.</p>
+                    <p class="letter-p" data-index="12">terima kasih karena sudah bertahan.</p>
+                    <p class="letter-p" data-index="13">terima kasih karena sudah menyayangi aku.</p>
+                    <p class="letter-p font-cursive-hand text-2xl text-[#FFD6E0]" data-index="14">dan terima kasih karena masih mau mendengarkan aku sampai hari ini.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 4. SECTION PENUTUP & INTERACTION -->
+    <section id="closing-section" class="min-h-screen py-24 flex flex-col justify-center items-center relative z-10 px-6">
+        <div class="container mx-auto max-w-2xl">
+            <div class="glass-card rounded-2xl p-8 md:p-12 border border-white/10 shadow-2xl text-center flex flex-col items-center">
+                <div class="absolute top-0 left-0 right-0 h-[4px] bg-gradient-to-r from-transparent via-[#FF7096] to-transparent"></div>
+                
+                <h3 class="font-serif-lux text-2xl text-[#FFD6E0] mb-6 tracking-wide">Sebuah Pesan Akhir 🌹</h3>
+                
+                <p class="text-sm md:text-base leading-relaxed text-[#FFF5F5] font-light mb-4">
+                    makasih ya sayang, kalau kamu sudah sampai di halaman ini berarti kamu sudah meluangkan waktu untuk membaca semuanya.
+                </p>
+                <p class="text-sm md:text-base leading-relaxed text-[#FFF5F5] font-light mb-4">
+                    aku tidak tahu apakah kata-kata di atas cukup untuk memperbaiki kesalahan yang sudah aku buat.
+                </p>
+                <p class="text-sm md:text-base leading-relaxed text-[#FFF5F5] font-light mb-4">
+                    tapi aku ingin kamu tahu kalau setiap kalimat yang ada di sini aku tulis dengan tulus.
+                </p>
+                <p class="text-sm md:text-base leading-relaxed text-[#FFF5F5] font-light mb-8">
+                    terima kasih karena masih bertahan, masih mau mendengarkan, dan masih mau hadir.
+                </p>
+
+                <p id="gift-hint" class="font-cursive-hand text-xl text-[#FFD6E0] mb-8 animate-pulse">
+                    sebelum selesai, aku punya sesuatu untuk kamu.
+                </p>
+
+                <!-- Gift Box Wrapper -->
+                <div class="gift-box-wrap" id="gift-section">
+                    <div class="text-xs font-semibold text-[#FFD6E0] uppercase tracking-widest mb-4">
+                        Hadiah Kecil Untuk Adik
+                    </div>
+                    <div class="gift-box mx-auto" id="interactive-gift">
+                        <div class="gift-lid">
+                            <div class="gift-ribbon-v"></div>
+                        </div>
+                        <div class="gift-body">
+                            <div class="gift-ribbon-h"></div>
+                        </div>
+                    </div>
+
+                    <!-- Hidden Button to be revealed upon opening box -->
+                    <div id="hidden-reward" class="mt-8 opacity-0 scale-75 transition-all duration-700">
+                        <!-- Tautan di bawah ini bisa diganti sesuai keinginan Anda -->
+                        <a href="https://link.dana.id/danakaget?c=sxushg52x&r=byQOfj&orderId=20260530101214915815010300166515980410372" target="_blank" class="glass-card bg-[#FF7096]/20 border-[#FF7096] text-[#F9F6EE] hover:bg-[#FF7096]/40 font-serif-lux px-8 py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all duration-300 shadow-lg inline-flex items-center gap-2">
+                            🎁 Buka Hadiahnya <i class="fa-solid fa-sparkles"></i>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+    
+    <!-- 5. ENDING (Hati Besar) -->
+    <section id="ending-section" class="min-h-screen py-24 flex flex-col justify-center items-center relative z-10 px-6 text-center">
+        <div class="container mx-auto max-w-2xl flex flex-col items-center">
+            <h2 class="font-serif-lux text-3xl md:text-5xl text-[#FFD6E0] tracking-wide mb-4 leading-snug">
+                Terima kasih sudah hadir di hidup aku.
+            </h2>
+            <p class="font-cursive-hand text-xl md:text-3xl text-[#FFF5F5] mb-12">
+                Aku akan selalu bersyukur karena pernah dipertemukan dengan kamu.
+            </p>
+
+            <!-- Big Heart Beating -->
+            <div id="ending-heart" class="text-[#FF7096] text-8xl md:text-9xl mt-4 heart-beat filter drop-shadow-[0_0_15px_rgba(255,112,150,0.8)] opacity-0 transition-opacity duration-1000">
+                <i class="fa-solid fa-heart"></i>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER MINIMALIS ELEGAN (Tanpa Spotify) -->
+    <footer class="py-12 border-t border-white/5 bg-black/20 text-center relative z-10">
+        <p class="font-cursive-hand text-[#FFD6E0] text-lg">Made with infinite love for Keyla My Masterpiece 🤍</p>
+    </footer>
+
+    <!-- INTERACTIVE PEEKING CUTE CSS CAT -->
+    <div class="peeking-cat" id="cute-cat">
+        <div class="cat-bubble" id="cat-bubble">Meow~ 🤍</div>
+        <div class="cat-ear cat-ear-left"></div>
+        <div class="cat-ear cat-ear-right"></div>
+        <div class="cat-head">
+            <div class="cat-eyes">
+                <div class="cat-eye"></div>
+                <div class="cat-eye"></div>
+            </div>
+            <div class="cat-nose"></div>
+            <div class="cat-blush cat-blush-left"></div>
+            <div class="cat-blush cat-blush-right"></div>
+            <div class="cat-paws">
+                <div class="cat-paw"></div>
+                <div class="cat-paw"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT SYSTEM CONTROLLER (Aman, Tanpa Timing Bugs / HP Compatibility) -->
+    <script>
+        // DOM ELEMENTS
+        const loadingScreen = document.getElementById('loading-screen');
+        const bgMusic = document.getElementById('bg-music');
+        const musicBtn = document.getElementById('music-btn');
+        const envelope = document.getElementById('royal-envelope');
+        const openBtn = document.getElementById('open-btn');
+        const letterSection = document.getElementById('letter-section');
+        const paragraphs = document.querySelectorAll('.letter-p');
+        const giftHint = document.getElementById('gift-hint');
+        const giftSection = document.getElementById('gift-section');
+        const interactiveGift = document.getElementById('interactive-gift');
+        const hiddenReward = document.getElementById('hidden-reward');
+        const endingHeart = document.getElementById('ending-heart');
+        const cuteCat = document.getElementById('cute-cat');
+        const catBubble = document.getElementById('cat-bubble');
+
+        // TWINKLING BACKGROUND STARS GENERATION
+        function generateTwinklingStars() {
+            const sky = document.getElementById('sky-stars');
+            if (!sky) return;
+            for (let i = 0; i < 60; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                const size = Math.random() * 3 + 1;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.left = `${Math.random() * 100}vw`;
+                star.style.top = `${Math.random() * 100}vh`;
+                star.style.animationDuration = `${Math.random() * 3 + 2}s`;
+                star.style.animationDelay = `${Math.random() * 5}s`;
+                sky.appendChild(star);
+            }
+        }
+
+        // CONSTANT FALLING HEARTS
+        function generateFallingHearts() {
+            setInterval(() => {
+                const heart = document.createElement('div');
+                heart.classList.add('falling-heart');
+                heart.innerHTML = Math.random() > 0.4 ? '❤️' : '🤍';
+                heart.style.left = `${Math.random() * 100}vw`;
+                heart.style.fontSize = `${Math.random() * 15 + 10}px`;
+                heart.style.animationDuration = `${Math.random() * 5 + 4}s`;
+                heart.style.opacity = Math.random() * 0.6 + 0.2;
+                document.body.appendChild(heart);
+
+                setTimeout(() => {
+                    heart.remove();
+                }, 9000);
+            }, 600);
+        }
+
+        // HIDDEN FLOATING NOTES DISPENSER
+        const hiddenNotes = [
+            "aku sayang kamu",
+            "terima kasih sudah bertahan",
+            "you mean a lot to me",
+            "virtual hug sent",
+            "aku bersyukur ketemu kamu"
+        ];
+
+        function startFloatingNotes() {
+            setInterval(() => {
+                const note = document.createElement('div');
+                note.classList.add('floating-note');
+                note.innerText = hiddenNotes[Math.floor(Math.random() * hiddenNotes.length)];
+                note.style.left = `${Math.random() * 70 + 10}vw`;
+                note.style.animationDuration = `${Math.random() * 4 + 6}s`;
+                document.body.appendChild(note);
+
+                setTimeout(() => {
+                    note.remove();
+                }, 10000);
+            }, 5000);
+        }
+
+        // TOUCH/MOUSE SPARKLE HEARTS
+        function spawnSparkle(x, y) {
+            const sparkle = document.createElement('div');
+            sparkle.classList.add('touch-heart');
+            sparkle.innerHTML = Math.random() > 0.5 ? '💖' : '🌸';
+            sparkle.style.left = `${x - 10}px`;
+            sparkle.style.top = `${y - 10}px`;
+            sparkle.style.fontSize = `${Math.random() * 10 + 15}px`;
+            document.body.appendChild(sparkle);
+
+            setTimeout(() => {
+                sparkle.remove();
+            }, 1000);
+        }
+
+        document.addEventListener('mousemove', function(e) {
+            if (Math.random() > 0.85) {
+                spawnSparkle(e.pageX, e.pageY);
+            }
+        });
+
+        document.addEventListener('touchmove', function(e) {
+            if (Math.random() > 0.8) {
+                const touch = e.touches[0];
+                spawnSparkle(touch.pageX, touch.pageY);
+            }
+        });
+
+        // REVEAL LETTER PARAGRAPHS SEQUENTIALLY ON SCROLL
+        function checkScrollParagraphs() {
+            paragraphs.forEach(p => {
+                const rect = p.getBoundingClientRect();
+                const triggerPoint = window.innerHeight * 0.85;
+                if (rect.top < triggerPoint && !p.classList.contains('reveal')) {
+                    p.classList.add('reveal');
+                    const puffX = window.innerWidth / 2 + (Math.random() * 100 - 50);
+                    const puffY = window.scrollY + rect.top + (rect.height / 2);
+                    for (let i = 0; i < 5; i++) {
+                        setTimeout(() => {
+                            spawnSparkle(puffX + (Math.random() * 60 - 30), puffY + (Math.random() * 40 - 20));
+                        }, i * 100);
+                    }
+                }
+            });
+
+            // Reveal Ending Heart on close scroll
+            const rectEnding = endingHeart.getBoundingClientRect();
+            if (rectEnding.top < window.innerHeight * 0.9) {
+                endingHeart.classList.remove('opacity-0');
+            }
+        }
+
+        // COLOURED CONFETTI let-out (CONFIDED FOR GIFT BOX OPENING)
+        function triggerConfettiBurst() {
+            const colors = ['#FFD6E0', '#FFF5F5', '#FF7096', '#B76E79', '#FFFFFF'];
+            for (let i = 0; i < 100; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.classList.add('confetti');
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.left = `${Math.random() * 100}vw`;
+                    confetti.style.top = `-10px`;
+                    confetti.style.fontSize = `${Math.random() * 10 + 5}px`;
+                    confetti.style.animationDuration = `${Math.random() * 3 + 2}s`;
+                    confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+                    document.body.appendChild(confetti);
+
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, 5000);
+                }, i * 30);
+            }
+        }
+
+        // ENVELOPE GATE & AUDIO AUTOMATIC TRIGGERS
+        function openMuseum() {
+            if (!envelope) return;
+
+            // 1. Open flap and pull out paper
+            envelope.classList.add('opened');
+
+            // 2. Play background music loop cleanly
+            if (bgMusic) {
+                bgMusic.play().then(() => {
+                    if (musicBtn) musicBtn.classList.add('playing');
+                }).catch(err => {
+                    console.log("Audio deferred until additional user gesture.", err);
+                });
+            }
+
+            // 3. Smooth scroll down directly into the newly opened letter area after animations complete
+            setTimeout(() => {
+                if (letterSection) {
+                    letterSection.scrollIntoView({ behavior: 'smooth' });
+                }
+            }, 1200);
+        }
+
+        // BACKROUND MUSIC TOGGLER
+        function toggleMusic() {
+            if (!bgMusic || !musicBtn) return;
+            if (bgMusic.paused) {
+                bgMusic.play().then(() => {
+                    musicBtn.classList.add('playing');
+                });
+            } else {
+                music.pause();
+                musicBtn.classList.remove('playing');
+            }
+        }
+
+        // MUSIC PLAYBACK EXPOSURE ON GATE BUTTON click
+        if (openBtn) {
+            openBtn.addEventListener('click', openMuseum);
+        }
+
+        if (musicBtn) {
+            musicBtn.addEventListener('click', toggleMusic);
+        }
+
+        // REVEAL GIFT BOX IN CLOSING CARD
+        let giftBoxTriggered = false;
+        function checkScrollGiftBox() {
+            if (giftBoxTriggered) return;
+            const rect = giftHint.getBoundingClientRect();
+            if (rect.top < window.innerHeight * 0.85) {
+                giftBoxTriggered = true;
+                setTimeout(() => {
+                    giftSection.classList.add('visible');
+                    const boxX = window.innerWidth / 2;
+                    const boxY = window.scrollY + giftSection.getBoundingClientRect().top + 50;
+                    for (let i = 0; i < 8; i++) {
+                        setTimeout(() => spawnSparkle(boxX + (Math.random() * 80 - 40), boxY + (Math.random() * 80 - 40)), i * 150);
+                    }
+                }, 3000); // 3 seconds delay as requested
+            }
+        }
+
+        // GIFT BOX UNLOCK ACTION
+        if (interactiveGift) {
+            interactiveGift.addEventListener('click', function() {
+                if (this.classList.contains('opened')) return;
+                this.classList.add('opened');
+                
+                const boxX = window.innerWidth / 2;
+                const boxY = window.scrollY + this.getBoundingClientRect().top + 50;
+                for (let i = 0; i < 15; i++) {
+                    setTimeout(() => spawnSparkle(boxX + (Math.random() * 100 - 50), boxY + (Math.random() * 100 - 50)), i * 100);
+                }
+
+                triggerConfettiBurst();
+
+                setTimeout(() => {
+                    hiddenReward.classList.remove('opacity-0', 'scale-75');
+                    hiddenReward.classList.add('opacity-100', 'scale-100');
+                }, 1000);
+            });
+        }
+
+        // CUTE CAT EVENT CONTROLLER (Meow speech cycle)
+        const catMeows = [
+            "Meow~ 🤍",
+            "Jangan sedih ya... 🥰",
+            "I'm here for you! 🐾",
+            "Sayang Keylaa! 💕",
+            "Purr... purr... 🌸",
+            "You are special! ✨"
+        ];
+        let meowTimeout;
+        if (cuteCat && catBubble) {
+            cuteCat.addEventListener('click', () => {
+                // Clear any existing timeouts to reset speech bubble
+                clearTimeout(meowTimeout);
+                
+                // Set random cute speech
+                catBubble.innerText = catMeows[Math.floor(Math.random() * catMeows.length)];
+                cuteCat.classList.add('meow');
+
+                // Let out heart sparkles around cat head
+                const catRect = cuteCat.getBoundingClientRect();
+                const catX = catRect.left + (catRect.width / 2);
+                const catY = window.scrollY + catRect.top;
+                for (let i = 0; i < 4; i++) {
+                    setTimeout(() => spawnSparkle(catX + (Math.random() * 40 - 20), catY + (Math.random() * 20 - 10)), i * 150);
+                }
+
+                // Hide speech bubble after 2.5 seconds
+                meowTimeout = setTimeout(() => {
+                    cuteCat.classList.remove('meow');
+                }, 2500);
+            });
+        }
+
+        // WINDOW SCROLL WATCHER
+        window.addEventListener('scroll', () => {
+            checkScrollParagraphs();
+            checkScrollGiftBox();
+        });
+
+        // SYSTEM LOAD KICKSTART
+        window.addEventListener('load', () => {
+            generateTwinklingStars();
+            
+            setTimeout(() => {
+                if (loadingScreen) {
+                    loadingScreen.style.opacity = '0';
+                    setTimeout(() => {
+                        loadingScreen.style.display = 'none';
+                        generateFallingHearts();
+                        startFloatingNotes();
+                    }, 800);
+                }
+            }, 2500);
+        });
+    </script>
+</body>
+</html>
